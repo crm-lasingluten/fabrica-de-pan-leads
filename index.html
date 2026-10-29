@@ -87,6 +87,7 @@ h1{font-family:var(--f-disp);font-weight:400;font-size:46px;line-height:.95;marg
 .when{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
 .when b{color:var(--ink);font-weight:600}
 .lbl{display:none}
+.tag{display:inline-block;vertical-align:2px;margin-left:4px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--y);color:var(--y-ink);padding:2px 7px;border-radius:4px}
 .chip{border:1.5px solid transparent;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800;letter-spacing:.04em;min-width:72px;display:inline-flex;justify-content:center;gap:6px;align-items:center}
 .chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
 .chip[data-v="si"]{background:var(--ok-soft);color:var(--ok)}
@@ -212,7 +213,7 @@ h1{font-family:var(--f-disp);font-weight:400;font-size:46px;line-height:.95;marg
     <div class="row head" role="row"><span>Nutricionista</span><span>Fechas</span><span>Muestra</span><span>Contestó</span><span>Le interesa</span><span></span></div>
     <div class="empty" id="empty" hidden>
       <h2>Todavía no hay pedidos</h2>
-      <p>Cuando una nutricionista pida muestras, cargala con “Nuevo pedido”. Después marcás si se envió la muestra, si contestó y si le interesa.</p>
+      <p>Los pedidos del formulario web aparecen solos. Los que lleguen por otro medio, cargalos con “Nuevo pedido”. Después marcás si se envió la muestra, si contestó y si le interesa.</p>
       <button class="btn btn-y" type="button" id="btn-add-empty">+ Nuevo pedido</button>
     </div>
   </div>
@@ -275,7 +276,7 @@ h1{font-family:var(--f-disp);font-weight:400;font-size:46px;line-height:.95;marg
 
   /* fila de base de datos <-> objeto de la página */
   const fromDb = r => ({ id:r.id, nombre:r.nombre, matricula:r.matricula, email:r.email, telefono:r.telefono, direccion:r.direccion, ciudad:r.ciudad, provincia:r.provincia,
-    fechaPedido:r.fecha_pedido, envio:r.envio ? "si" : "no", fechaEnvio:r.fecha_envio, contesto:r.contesto ? "si" : "no", interes:r.interes || "pend", notas:r.notas });
+    origen:r.origen || "manual", fechaPedido:r.fecha_pedido, envio:r.envio ? "si" : "no", fechaEnvio:r.fecha_envio, contesto:r.contesto ? "si" : "no", interes:r.interes || "pend", notas:r.notas });
   const toDb = d => ({ nombre:d.nombre, matricula:d.matricula || null, email:d.email || null, telefono:d.telefono || null, direccion:d.direccion || null,
     ciudad:d.ciudad || null, provincia:d.provincia || null, fecha_pedido:d.fechaPedido || today(), envio:d.envio === "si",
     fecha_envio:d.envio === "si" ? (d.fechaEnvio || today()) : null, contesto:d.contesto === "si", interes:d.interes || "pend", notas:d.notas || null });
@@ -338,6 +339,7 @@ h1{font-family:var(--f-disp);font-weight:400;font-size:46px;line-height:.95;marg
       const row = document.createElement("div"); row.className = "row" + (isStale(r) ? " stale" : ""); row.setAttribute("role", "row");
       const who = document.createElement("div"); who.className = "who";
       const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = r.nombre || "Sin nombre";
+      if (r.origen === "formulario"){ const t = document.createElement("span"); t.className = "tag"; t.textContent = "Formulario web"; nm.append(" ", t); }
       const mt = document.createElement("div"); mt.className = "mt";
       mt.textContent = [r.matricula, [r.ciudad, r.provincia].filter(Boolean).join(", "), r.email || r.telefono].filter(Boolean).join(" · ") || "Sin datos de contacto";
       who.append(nm, mt);
